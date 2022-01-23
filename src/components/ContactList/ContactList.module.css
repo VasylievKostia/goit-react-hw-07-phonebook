@@ -1,0 +1,19 @@
+.section {
+  /* background-color: aqua; */
+  width: 400px;
+  margin-right: auto;
+  margin-left: auto;
+  box-sizing: border-box;
+}
+.list {
+  padding: 0px 45px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  /* background-color: rebeccapurple; */
+  margin-top: 5px;
+}
