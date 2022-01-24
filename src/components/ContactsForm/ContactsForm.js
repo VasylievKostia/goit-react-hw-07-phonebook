@@ -1,67 +1,70 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-// import { connect } from 'react-redux'
-import { getContacts } from "../../redux/Phonebook/Contacts";
-import { addContact } from "../../redux/Phonebook/Phonebook-actions";
-import shortid from 'shortid';
 import s from '../ContactsForm/ContactsForm.module.css'
-import { useSelector } from "react-redux";
+
+import { useState } from "react";
+import { useAddContactMutation, useFetchContactsQuery } from "../../redux/contacts/contactsSlice";
+
+import shortid from 'shortid';
 
 import Notify from 'simple-notify'
 import 'simple-notify/dist/simple-notify.min.css'
 
+
 export function ContactsForm() {
   const [name, setName] = useState('')
-  const [number, setNumber] = useState('')
-
+  const [number, setNumber] = useState('')  
   const nameInputId = shortid.generate();
   const numberInputId = shortid.generate()
+  
+  //====RTQ====
+  const [addContact] = useAddContactMutation()
+  const {data} = useFetchContactsQuery()
+ //====RTQ====
 
-  // const contacts = useSelector(getContacts)
-  // console.log(contacts)
-
-  // ====== REDUX==========
-  const dispatch = useDispatch()
-  // ====== REDUX==========
+  
   const  handleChangeInput = event => {
      setName(event.currentTarget.value)
   }
+
   const handleChangeNumber = event => {
       setNumber(event.currentTarget.value)
   }
+
   const handleSubmit = event => {
     event.preventDefault()
-    
-  //   const obj = {
-  //     id: shortid.generate(),
-  //     name: name,
-  //     number: number
-  //   }
-  //   if (!contacts.find((contact) => contact.name === name)) {
-  //     dispatch(addContact(obj))
-  //     // console.log( 'add in ContactForm', dispatch(addContact(obj)))
-      
-  //     resetState()
-  //   }
-  //   else {
-  //   new Notify({
-  //   status: 'error',
-  //   text: `Name "${name}" is already in contacts`,
-  //   effect: 'slide',
-  //   type: 3
-  // })
-  //   }
-   
+    const obj = {
+      id: shortid.generate(),
+      name: name,
+      number: number
     }
-    const resetState = () => {
-      setNumber('')
-      setName('')
+    if (!data.find((contact) => contact.name === name)) {
+      addContact(obj)
+      new Notify({
+        status: 'success',
+        text: `Contact "${name}" is adding to your contacts`,
+        effect: 'slide',
+        type: 3,
+        autoclose: 2000,
+      })
+      resetState()
     }
+    else {
+    new Notify({
+    status: 'error',
+    text: `Name "${name}" is already in contacts`,
+    effect: 'slide',
+      type: 3,
+      autoclose: 2000,
+  })
+    }
+  }
+  const resetState = () => {
+    setNumber('')
+    setName('')
+  }
   
-  
-    return <section className={s.section}>
+  return <section className={s.section}>
     <form className={s.form}
-      onSubmit={/*handleSubmit*/ ()=>{}}
+      onSubmit={handleSubmit}
     >
             
     <div className={s.inputWrapper}>
@@ -71,7 +74,7 @@ export function ContactsForm() {
       type="text"
       name="name"
       value={name}
-      onChange={/*handleChangeInput*/ ()=>{}}
+      onChange={handleChangeInput}
       pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
       title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
       required/>
@@ -85,7 +88,7 @@ export function ContactsForm() {
         value={number}
         type="tel"
         name="number"
-  onChange={/*handleChangeNumber*/ ()=>{}}
+  onChange={handleChangeNumber}
         pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
         title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
         required
@@ -93,12 +96,5 @@ export function ContactsForm() {
       </div>
       <button type='submit' className={s.button}> Add Contact</button>
         </form>
-        </section>
-    
+        </section>    
 }
-
-// const mapDispatchToProps = dispatch => ({
-//   onFormSubmit: (obj) => dispatch (PhonebookActions.addNewContact(obj))
-// })
-
-// export default connect(null,mapDispatchToProps)(ContactsForm)

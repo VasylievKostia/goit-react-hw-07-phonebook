@@ -13,7 +13,7 @@ import {
   REGISTER,
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { ContactList } from "../components/ContactList/ContactList";
+
 import { contactsApi } from "./contacts/contactsSlice";
 
 const persistConfig = {
@@ -26,28 +26,23 @@ const persistConfig = {
 const persistedPhonebookReduser = persistReducer( persistConfig, PhonebookReducer)
 
 const rootReducer = combineReducers({
-  phonebook: persistedPhonebookReduser, 
- [contactsApi.reducerPath]: contactsApi.reducer,
+  phonebook: persistedPhonebookReduser,
 })
 
-
-
-
-// const store = createStore(rootReducer, composeWithDevTools())
 const store = configureStore({
-    reducer: rootReducer,
+  reducer: {
+    [contactsApi.reducerPath]: contactsApi.reducer,
+    rootReducer
+  },
   middleware: getDefaultMiddleware =>
       
-    getDefaultMiddleware(
-      getDefaultMiddleware().concat(contactsApi.middleware),
-      {
-      
+    getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    })
+    }).concat(contactsApi.middleware)
 })
-console.log(contactsApi)
+
 export default store
 
 export const persistor = persistStore(store)
