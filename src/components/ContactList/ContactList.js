@@ -16,10 +16,8 @@ const override = css`
 export function ContactList() {
     const filter = useSelector(getFilter)
     const { data, isFetching } = useFetchContactsQuery()
-    const [loading, setLoading] = useState(true);
-    const [mousePositionX, setMousePositionX] = useState(0)
-    const [mousePositionY, setMousePositionY] = useState(0)
-    
+    const [loading] = useState(true);
+    const [position, setPosition] = useState({ x: 0, y: 0 })
 
     const filteredContacts = () => {
         return data.filter((contact) =>
@@ -27,29 +25,27 @@ export function ContactList() {
         )
     }    
     
-//=========Spiner on mouseOver=========
-    // useEffect(() => {
-    //     window.addEventListener('mouseover', function (e) {
-    //         setMousePositionX(e.x)
-    //         setMousePositionY(e.y)
-    //     })
-    // },[])
-  
-    // const style = {
-    //     position: "absolute",
-    //     left: mousePositionX ,
-    //     top: mousePositionY,
-    // };
+// =========Spiner on mouseOver=========
+  useEffect(() => {
+    function setFromEvent(event) {
+      setPosition({ x: event.pageX, y: event.pageY });
+    }
+    window.addEventListener("mousemove", setFromEvent);
+
+    return () => {
+      window.removeEventListener("mousemove", setFromEvent);
+    };
+  }, []);
+
     const style = {
         position: "absolute",
-        left: "57%" ,
-        top: "50%",
+        left: position.x + 20,
+        top: position.y - 20,
     };
-    
 
     return <section className={s.section}>
         {isFetching &&
-            <div style={style} top={mousePositionX} left={mousePositionY}><ClipLoader loading={loading}
+            <div style={style} ><ClipLoader loading={loading}
             css={override}
             size={30}
             color={"#36D7B7"}
